@@ -1,18 +1,38 @@
 module Countle
 
-    let rec expand values results = 
+    let add a b = a + b
+    let multiply a b = a * b
+
+    let operations = [ add; multiply]
+    let rec permutations (values: int list) = 
         match values with
-        | [] -> results
-        | [v] -> results
-        | first :: rest -> 
-            let newResults = rest |> List.map (fun v -> v + first )
-            expand rest results@newResults
+        | [] -> []
+        | [v] -> [values]
+        | _ -> values 
+            |> List.collect (fun v -> 
+                (permutations (values |> List.except [v])) 
+                |> List.map (fun l -> [v]@l)) 
+    
+    let addFirst (values: int list) = 
+        match values with
+        | [] -> []
+        | [v] -> values
+        | _ -> [values[0] + values[1]]@values[2..]
+    
+    let operateFirst (values: int list) = 
+        match values with
+        | [] -> []
+        | [v] -> [values]
+        | _ -> operations |> List.map (fun o -> [o values[0] values[1]]@values[2..])
 
-    let rec all (values: list<list<int>>) = 
-        let len = values |> List.minBy (fun v -> v.Length)
+    let condenseOne values =
+        permutations values |> List.collect operateFirst
+    
+    let rec condense values =
+        match values with
+        | [] -> []
+        | [v] -> [values]
+        | _ -> condenseOne values |> List.collect condense
 
-        match len.Length with
-        | 0 -> values
-        | 1 -> values
-        | 2 -> values
-        | _ -> all values 
+    let condenseDistinct values = 
+        condense values |> List.distinct

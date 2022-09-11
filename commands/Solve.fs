@@ -5,6 +5,10 @@ module Solve =
     open Countle
     open Output
 
+    let printList values =
+        values |> Seq.iter (fun value -> printf "%i " value)
+        printfn ""
+
     type SolveSettings() =
         inherit CommandSettings()
 
@@ -23,6 +27,25 @@ module Solve =
         override _.Execute(_context, settings) = 
             printMarkedUp $"Solving ..."
 
-            let results = expand [1;2;3] []
-            results |> List.iter(fun r -> printMarkedUp r)
+            let input = [200; 3; 11; 15; 7]
+            printf "Input: "
+            printList input
+
+            // printf "Add first: "
+            // printList (addFirst input)
+
+            // printfn "Operate first: "
+            // (operateFirst input) |> List.iter printList
+
+            // printf "Condense One: "
+            // condenseOne input |> List.iter printList
+
+            printf "Condense Fully: "
+            let results = condenseDistinct input
+            printfn "Input condenses to %i numbers." results.Length
+            results |> List.iter printList
+
+            // let results = permutations input 
+            // printfn "Found %i permutations." results.Length
+            // results |> List.iter printList
             0
