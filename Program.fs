@@ -6,9 +6,8 @@ let main argv =
 
     let app = CommandApp()
     app.Configure(fun config ->
-        config.AddCommand<Greet.Hello>("greet")
-            .WithAlias("g")
-            .WithDescription("Greets the user running the application.")
+        config.AddCommand<Solve.Solve>("solve")
+            .WithAlias("s")
             |> ignore)
 
     app.Run(argv)
