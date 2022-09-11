@@ -27,7 +27,7 @@ module Solve =
         override _.Execute(_context, settings) = 
             printMarkedUp $"Solving ..."
 
-            let input = [200; 3; 11; 15; 7]
+            let input = [3; 11; 15; 7]
             printf "Input: "
             printList input
 
