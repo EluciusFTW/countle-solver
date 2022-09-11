@@ -23,14 +23,14 @@ module Countle
         divide
     ]
 
-    let rec permutations (values: int list) = 
+    let rec permutations values = 
         match values with
         | [] -> []
         | [_] -> [values]
         | _ -> values 
-            |> List.collect (fun v -> 
-                (permutations (values |> List.except [v])) 
-                |> List.map (fun l -> [v]@l)) 
+            |> List.collect (fun value -> 
+                (permutations (values |> List.except [value])) 
+                |> List.map (fun l -> [value]@l)) 
     
     let operate (values: int list) = 
         match values with
