@@ -8,44 +8,45 @@ module Solve =
     let printList values =
         values |> Seq.iter (fun value -> printf "%i " value)
         printfn ""
+    
+    let printIntermediates (rows: row list) = 
+        printfn "Solution:"
+        rows
+        |> List.iter (fun row -> 
+            match row.result with
+            | Some value -> printfn $"{row.left} {row.operation} {row.right} = {value}"
+            | None -> failwith "Expected finite result, but there was none.")
+        printfn ""
 
     type SolveSettings() =
         inherit CommandSettings()
 
-        // [<CommandOption("-n|--name")>]
-        // member val name = "friend" with get, set
+        [<CommandOption("-n|--numbers")>]
+        member val numbers = "" with get, set
 
-        // override _.Validate() =
-        //     match self.name.Length with
-        //     | 1 -> Spectre.Console.ValidationResult.Error($"That's an awfully short name, I don't buy it.")
-        //     | _ -> Spectre.Console.ValidationResult.Success()
+        [<CommandOption("-t|--target")>]
+        member val target = 0 with get, set
+
+        [<CommandOption("-m|--maxSolutions")>]
+        member val maxSolutions = 5 with get, set
     
     type Solve() =
         inherit Command<SolveSettings>()
         interface ICommandLimiter<SolveSettings>
 
         override _.Execute(_context, settings) = 
-            printMarkedUp $"Solving ..."
 
-            let input = [3; 11; 15; 7]
-            printf "Input: "
-            printList input
+            let values = 
+                settings.numbers.Split(',') 
+                |> Array.map int 
+                |> Array.toList 
 
-            // printf "Add first: "
-            // printList (addFirst input)
+            printfn "Input: %A" values
+            printfn "Target: %i" settings.target
+            printfn "Limit to solutions: %i" settings.maxSolutions
 
-            // printfn "Operate first: "
-            // (operateFirst input) |> List.iter printList
-
-            // printf "Condense One: "
-            // condenseOne input |> List.iter printList
-
-            printf "Condense Fully: "
-            let results = condenseDistinct input
-            printfn "Input condenses to %i numbers." results.Length
-            results |> List.iter printList
-
-            // let results = permutations input 
-            // printfn "Found %i permutations." results.Length
-            // results |> List.iter printList
+            printfn "Calculating solutions ... "
+            getSolutions values settings.target
+                |> List.truncate settings.maxSolutions
+                |> List.iter printIntermediates
             0
