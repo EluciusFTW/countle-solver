@@ -23,6 +23,12 @@ module Countle
         divide
     ]
 
+    type row = 
+     { left: int; right: int; operation: string }
+     
+    type intermediate =
+        { values: int list;  }
+
     let rec permutations values = 
         match values with
         | [] -> []
