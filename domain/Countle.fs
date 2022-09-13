@@ -28,26 +28,34 @@ type row =
 
 type intermediate = { values: int list; rows: row list }
 
-let rec permutations values =
-    match values with
-    | [] -> []
-    | [ _ ] -> [ values ]
-    | _ ->
-        values
-        |> List.collect (fun value ->
-            (permutations (values |> List.except [ value ]))
-            |> List.map (fun l -> [ value ] @ l))
+let exceptPositions values positions =
+    values
+    |> Seq.mapi (fun index value -> 
+        match positions |> List.contains index with
+        | true -> -1
+        | false -> value)
+    |> Seq.filter (fun value -> value > 0)
+    |> Seq.toList
 
+let pickFromOrdered (values: int list) =
+    let length = values.Length
+    seq {
+        for row in 0 .. length - 2 do
+            for col in row + 1 .. length - 1 -> [row; col]
+    } 
+    |> Seq.toList
+    |> List.map (fun pair -> [values[pair[0]]; values[pair[1]]]@(exceptPositions values pair)) 
+    
 let combineFirstTwoBy state operation =
-    let result = (fst operation) state.values[0] state.values[1]
+    let result = (fst operation) state.values[1] state.values[0]
     { values =
         match result with
         | Some value -> [ value ] @ state.values[2..]
         | None -> []
       rows =
         state.rows
-        @ [ { left = state.values[0]
-              right = state.values[1]
+        @ [ { left = state.values[1]
+              right = state.values[0]
               operation = (snd operation)
               result = result } ] }
 
@@ -58,7 +66,9 @@ let combineFirstTwo state =
     | _ -> operations |> List.map (combineFirstTwoBy state)
 
 let getNextRow state =
-    permutations state.values
+    state.values 
+    |> List.sortBy (fun v -> v)
+    |> pickFromOrdered
     |> List.map (fun permuted -> { values = permuted; rows = state.rows })
     |> List.collect combineFirstTwo
 
@@ -84,5 +94,5 @@ let getSolutions values target =
             | _ -> false
         | _ -> false)
     |> List.sortBy (fun state -> state.rows.Length)
-    |> List.map (fun state-> state.rows)
+    |> List.map (fun state -> state.rows)
     |> List.distinct
