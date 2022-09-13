@@ -23,6 +23,11 @@ Here, via the parameter
 * `(-t|--target)` one provides the target number.
 * `(-m|--maxSolutions)` one can, optionally, limit the solutions. The solutions are ordered ascending by the number of turns.
 
+## Sample
+Here is the countle solver in action on the puzzle form the 13th of September 2022 (yes, my battery was running quite low):
+
+![Screenshot of countle solving a puzzle](./assets/countle-in-action.png)
+
 ## Feedback and Contributing
 All feedback welcome!
 All contributions are welcome!
