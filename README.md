@@ -24,9 +24,11 @@ Here, via the parameter
 * `(-m|--maxSolutions)` one can, optionally, limit the solutions. The solutions are ordered ascending by the number of turns.
 
 ## Sample
-Here is the countle solver in action on the puzzle form the 13th of September 2022 (yes, my battery was running quite low):
+Here is the countle solver in action on the official puzzle from the 13th of September 2022. In the screenshot, the first two solutions are essentially the same (they just differ in the order of independent turns), whereas the third solution is different (it is also cut off there as it shows more variations of the same solutions below). 
 
 ![Screenshot of countle solving a puzzle](./assets/countle-in-action.png)
+
+Eliminating the 'same solutions' would be the next step, and interesting for the sake of determining all 'unique' solutions to a puzzle. 
 
 ## Feedback and Contributing
 All feedback welcome!
