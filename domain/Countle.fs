@@ -5,9 +5,12 @@ let add a b = Some(a + b)
 let multiply a b = Some(a * b)
 
 let divide a b =
-    match (a % b) with
-    | 0 -> Some(a / b)
-    | _ -> None
+    match b with
+    | 0 -> None
+    | _ -> 
+        match (a % b) with
+        | 0 -> Some(a / b)
+        | _ -> None
 
 let subtract a b =
     match (a - b) with
@@ -67,7 +70,7 @@ let combineFirstTwo state =
 
 let getNextRow state =
     state.values 
-    |> List.sortBy (fun v -> v)
+    |> List.sort
     |> pickFromOrdered
     |> List.map (fun permuted -> { values = permuted; rows = state.rows })
     |> List.collect combineFirstTwo
