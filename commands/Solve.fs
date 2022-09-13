@@ -44,8 +44,8 @@ module Solve =
             printfn "Input: %A" values
             printfn "Target: %i" settings.target
             printfn "Limit to solutions: %i" settings.maxSolutions
-
-            printfn "Calculating solutions ... "
+            printfn ""
+            
             getSolutions values settings.target
                 |> List.truncate settings.maxSolutions
                 |> List.iter printIntermediates
