@@ -22,6 +22,7 @@ Here, via the parameter
 * `(-n|--numbers)` one provides the numbers that can be used. They have to be comma-separated integers, and are not restricted to six as in the original game.
 * `(-t|--target)` one provides the target number.
 * `(-m|--maxSolutions)` one can, optionally, limit the solutions. The solutions are ordered ascending by the number of turns.
+* `(-e|--exactlyIn")` one can, optionally, filter for solutions that require exactly given amount of turns.
 
 ## Sample
 Here is the countle solver in action on the official puzzle from the 13th of September 2022. In the screenshot, the first two solutions are essentially the same (they just differ in the order of independent turns), whereas the third solution is different (it is also cut off there as it shows more variations of the same solutions below). 
