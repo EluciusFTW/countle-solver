@@ -1,4 +1,4 @@
-module Countle
+module Countle.Domain
 
 let add a b = Some(a + b)
 

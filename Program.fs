@@ -1,12 +1,12 @@
 ﻿open Spectre.Console.Cli
-open Commands
+open Countle.Commands
 
 [<EntryPoint>]
 let main argv =
 
     let app = CommandApp()
     app.Configure(fun config ->
-        config.AddCommand<Solve.Solve>("solve")
+        config.AddCommand<Solve>("solve")
             .WithAlias("s")
             |> ignore)
 
