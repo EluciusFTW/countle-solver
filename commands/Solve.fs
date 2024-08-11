@@ -1,17 +1,29 @@
 namespace Countle.Commands
 
 open Spectre.Console.Cli
+open SpectreCoff
 open Countle.Domain
 
 module Print =
+    let rowOutput row result = 
+        Many [
+            Calm $"{row.left}"
+            Pumped $"{row.operation}"
+            Calm $"{row.right}"
+            Calm "="
+            Edgy $"{result}"
+        ]
+
     let printRows (rows: row list) = 
-        printfn "Solution:"
+
+        alignedRule Left "Solution" |> toConsole
         rows
-        |> List.iter (fun row -> 
+        |> List.map (fun row -> 
             match row.result with
-            | Some value -> printfn $"{row.left} {row.operation} {row.right} = {value}"
-            | None -> failwith "Expected finite result, but there was none.")
-        printfn ""
+            | Some value -> rowOutput row value
+            | None -> E "Expected finite result, but there was none.")
+        |> Many 
+        |> toConsole
 
 type SolveSettings() =
     inherit CommandSettings()
@@ -33,22 +45,16 @@ type Solve() =
     interface ICommandLimiter<SolveSettings>
 
     override _.Execute(_context, settings) = 
-        
-        let values = 
-            settings.numbers.Split(',') 
-            |> Array.map int 
-            |> Array.toList 
-
-        printfn "Input: %A" values
-        printfn "Target: %i" settings.target
-        printfn "Limit to solutions: %i" settings.maxSolutions
-        printfn ""
-        
         let ofLenght (rows: row list) =
             match settings.steps with
             | 0 -> true
             | i -> rows.Length = i
 
+        let values = 
+            settings.numbers.Split(',') 
+            |> Array.map int 
+            |> Array.toList
+        
         getSolutions values settings.target
             |> List.filter ofLenght 
             |> List.truncate settings.maxSolutions

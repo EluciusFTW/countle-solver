@@ -1,16 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>fsharp_spectre_console_template</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="spectre/Output.fs" />
     <Compile Include="domain/Countle.fs" />
     <Compile Include="commands/Solve.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Spectre.Console" Version="0.44.0" />
+    <PackageReference Include="EluciusFTW.SpectreCoff" Version="0.49.2" />
+    <PackageReference Include="Spectre.Console.Cli" Version="0.49.1" />
   </ItemGroup>
 </Project>
