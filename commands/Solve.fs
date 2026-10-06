@@ -44,7 +44,7 @@ type Solve() =
     inherit Command<SolveSettings>()
     interface ICommandLimiter<SolveSettings>
 
-    override _.Execute(_context, settings) = 
+    override _.Execute(_context, settings, _cancellationToken) =
         let ofLenght (rows: row list) =
             match settings.steps with
             | 0 -> true
