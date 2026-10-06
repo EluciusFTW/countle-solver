@@ -10,4 +10,4 @@ let main argv =
             .WithAlias("s")
             |> ignore)
 
-    app.Run(argv)
+    app.Run argv
