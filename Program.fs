@@ -5,9 +5,6 @@ open Countle.Commands
 let main argv =
 
     let app = CommandApp()
-    app.Configure(fun config ->
-        config.AddCommand<Solve>("solve")
-            .WithAlias("s")
-            |> ignore)
+    app.Configure(fun config -> config.AddCommand<Solve>("solve").WithAlias("s") |> ignore)
 
     app.Run argv

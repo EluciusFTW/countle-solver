@@ -44,9 +44,11 @@ let ``every puzzle has a solution`` () =
 // randomly chosen valid operation until a single number is left, and use that as the target.
 // The steps are kept so that a failing case shows how its target was built.
 type SolvablePuzzle =
-    { numbers: int list
-      target: int
-      steps: string list }
+    {
+        numbers: int list
+        target: int
+        steps: string list
+    }
 
 let solvablePuzzle count =
     let rec combine pool steps =
@@ -55,7 +57,11 @@ let solvablePuzzle count =
             | [ result ] -> return result, List.rev steps
             | _ ->
                 let! i = Gen.choose (0, pool.Length - 1)
-                let! j = Gen.choose (0, pool.Length - 2) |> Gen.map (fun j -> if j >= i then j + 1 else j)
+
+                let! j =
+                    Gen.choose (0, pool.Length - 2)
+                    |> Gen.map (fun j -> if j >= i then j + 1 else j)
+
                 let larger, smaller = max pool[i] pool[j], min pool[i] pool[j]
 
                 let! f, symbol =
@@ -79,9 +85,11 @@ let solvablePuzzle count =
         let! target, steps = combine numbers []
 
         return
-            { numbers = numbers
-              target = target
-              steps = steps }
+            {
+                numbers = numbers
+                target = target
+                steps = steps
+            }
     }
 
 let private hasSolution puzzle =

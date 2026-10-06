@@ -5,24 +5,26 @@ open SpectreCoff
 open Countle.Domain
 
 module Print =
-    let rowOutput row result = 
-        Many [
-            Calm $"{row.left}"
-            Pumped $"{row.operation}"
-            Calm $"{row.right}"
-            Calm "="
-            Edgy $"{result}"
-        ]
+    let rowOutput row result =
+        Many
+            [
+                Calm $"{row.left}"
+                Pumped $"{row.operation}"
+                Calm $"{row.right}"
+                Calm "="
+                Edgy $"{result}"
+            ]
 
-    let printRows (rows: row list) = 
+    let printRows (rows: row list) =
 
         alignedRule Left "Solution" |> toConsole
+
         rows
-        |> List.map (fun row -> 
+        |> List.map (fun row ->
             match row.result with
             | Some value -> rowOutput row value
             | None -> E "Expected finite result, but there was none.")
-        |> Many 
+        |> Many
         |> toConsole
 
 type SolveSettings() =
@@ -50,13 +52,11 @@ type Solve() =
             | 0 -> true
             | i -> rows.Length = i
 
-        let values = 
-            settings.numbers.Split(',') 
-            |> Array.map int 
-            |> Array.toList
-        
+        let values = settings.numbers.Split(',') |> Array.map int |> Array.toList
+
         getSolutions values settings.target
-            |> List.filter ofLenght 
-            |> List.truncate settings.maxSolutions
-            |> List.iter Print.printRows
+        |> List.filter ofLenght
+        |> List.truncate settings.maxSolutions
+        |> List.iter Print.printRows
+
         0
