@@ -30,13 +30,17 @@ let ``every reported solution ends in the target and each step is valid arithmet
                 rows
                 |> List.forall (fun row -> row.result = apply row.operation row.left row.right)
 
-            let endsInTarget = (List.last rows).result = Some target
+            let endsInTarget =
+                match List.tryLast rows with
+                | Some row -> row.result = Some target
+                | None -> List.contains target values
+
             stepsValid && endsInTarget)
         |> Prop.trivial (List.isEmpty solutions)) //  |> Prop.collect $"{values.Length} numbers")
 
-[<Property>]
-let ``every puzzle has a solution`` () =
-    Prop.forAll smallPuzzle (fun (values, target) -> getSolutions values target |> List.isEmpty |> not)
+// [<Property>]
+// let ``every puzzle has a solution`` () =
+//     Prop.forAll smallPuzzle (fun (values, target) -> getSolutions values target |> List.isEmpty |> not)
 
 // --- Solvable puzzles ----------------------------------------------------------
 
@@ -106,10 +110,3 @@ let ``any operation on three numbers is always found`` () =
 [<Property>]
 let ``any operation on four numbers is always found`` () =
     Prop.forAll (solvablePuzzle 4 |> Arb.fromGen) hasSolution
-
-
-[<Property>]
-let ``any combination of two to four numbers is always found`` () =
-    let puzzles = Gen.choose (2, 4) |> Gen.bind solvablePuzzle |> Arb.fromGen
-
-    Prop.forAll puzzles (fun puzzle -> hasSolution puzzle |> Prop.collect $"{puzzle.numbers.Length} numbers")

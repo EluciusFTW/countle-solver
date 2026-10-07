@@ -19,13 +19,16 @@ module Print =
 
         alignedRule Left "Solution" |> toConsole
 
-        rows
-        |> List.map (fun row ->
-            match row.result with
-            | Some value -> rowOutput row value
-            | None -> E "Expected finite result, but there was none.")
-        |> Many
-        |> toConsole
+        match rows with
+        | [] -> Calm "The target is already among the numbers." |> toConsole
+        | _ ->
+            rows
+            |> List.map (fun row ->
+                match row.result with
+                | Some value -> rowOutput row value
+                | None -> E "Expected finite result, but there was none.")
+            |> Many
+            |> toConsole
 
 type SolveSettings() =
     inherit CommandSettings()

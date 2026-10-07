@@ -94,14 +94,17 @@ let rec getRows state target =
         |> List.filter (fun s -> s.values.Length > 0)
 
 let getSolutions values target =
-    getRows { values = values; rows = [] } target
-    |> List.filter (fun state ->
-        match (List.tryLast state.rows) with
-        | Some row ->
-            match row.result with
-            | Some result -> result = target
-            | _ -> false
-        | _ -> false)
-    |> List.sortBy (fun state -> state.rows.Length)
-    |> List.map (fun state -> state.rows)
-    |> List.distinct
+    match List.contains target values with
+    | true -> [ [] ]
+    | false ->
+        getRows { values = values; rows = [] } target
+        |> List.filter (fun state ->
+            match (List.tryLast state.rows) with
+            | Some row ->
+                match row.result with
+                | Some result -> result = target
+                | _ -> false
+            | _ -> false)
+        |> List.sortBy (fun state -> state.rows.Length)
+        |> List.map (fun state -> state.rows)
+        |> List.distinct
