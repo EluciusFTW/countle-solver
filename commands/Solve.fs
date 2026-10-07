@@ -5,14 +5,14 @@ open SpectreCoff
 open Countle.Domain
 
 module Print =
-    let rowOutput row result =
+    let rowOutput row =
         Many
             [
                 Calm $"{row.left}"
                 Pumped $"{row.operation}"
                 Calm $"{row.right}"
                 Calm "="
-                Edgy $"{result}"
+                Edgy $"{row.result}"
             ]
 
     let printRows (rows: row list) =
@@ -21,14 +21,7 @@ module Print =
 
         match rows with
         | [] -> Calm "The target is already among the numbers." |> toConsole
-        | _ ->
-            rows
-            |> List.map (fun row ->
-                match row.result with
-                | Some value -> rowOutput row value
-                | None -> E "Expected finite result, but there was none.")
-            |> Many
-            |> toConsole
+        | _ -> rows |> List.map rowOutput |> Many |> toConsole
 
 type SolveSettings() =
     inherit CommandSettings()
@@ -55,7 +48,7 @@ type Solve() =
             | 0 -> true
             | i -> rows.Length = i
 
-        let values = settings.numbers.Split(',') |> Array.map int |> Array.toList
+        let values = settings.numbers.Split ',' |> Array.map int |> Array.toList
 
         getSolutions values settings.target
         |> List.filter ofLenght

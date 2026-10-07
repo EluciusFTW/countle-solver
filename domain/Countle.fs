@@ -8,12 +8,12 @@ let divide a b =
     match b with
     | 0 -> None
     | _ ->
-        match (a % b) with
+        match a % b with
         | 0 -> Some(a / b)
         | _ -> None
 
 let subtract a b =
-    match (a - b) with
+    match a - b with
     | x when x >= 0 -> Some(a - b)
     | _ -> None
 
@@ -24,10 +24,12 @@ type row =
         left: int
         right: int
         operation: char
-        result: Option<int>
+        result: int
     }
 
 type intermediate = { values: int list; rows: row list }
+
+let initialState values = { values = values; rows = [] }
 
 let exceptPositions values positions =
     values
@@ -49,61 +51,55 @@ let pickFromOrdered (values: int list) =
     |> List.map (fun pair -> [ values[pair[0]]; values[pair[1]] ] @ (exceptPositions values pair))
 
 let combineFirstTwoBy state operation =
-    let result = fst operation state.values[1] state.values[0]
-
-    {
-        values =
-            match result with
-            | Some value -> [ value ] @ state.values[2..]
-            | None -> []
-        rows =
-            state.rows
-            @ [
-                {
-                    left = state.values[1]
-                    right = state.values[0]
-                    operation = (snd operation)
-                    result = result
-                }
-            ]
-    }
+    fst operation state.values[1] state.values[0]
+    |> Option.map (fun newValue ->
+        {
+            values = [ newValue ] @ state.values[2..]
+            rows =
+                state.rows
+                @ [
+                    {
+                        left = state.values[1]
+                        right = state.values[0]
+                        operation = snd operation
+                        result = newValue
+                    }
+                ]
+        })
 
 let combineFirstTwo state =
     match state.values with
     | [] -> []
-    | [ _ ] -> [ state ]
+    | [ _ ] -> [ Some state ]
     | _ -> operations |> List.map (combineFirstTwoBy state)
 
 let getNextRow state =
     state.values
     |> List.sort
     |> pickFromOrdered
-    |> List.map (fun permuted -> { values = permuted; rows = state.rows })
+    |> List.map (fun permuted -> { state with values = permuted })
     |> List.collect combineFirstTwo
 
-let rec getRows state target =
+let rec getStates (state: intermediate) target =
     match state.values with
     | [] -> []
     | [ v ] -> [ state ]
     | _ ->
         getNextRow state
+        |> List.choose id
         |> List.collect (fun s ->
             match List.contains target s.values with
             | true -> [ s ]
-            | false -> getRows s target)
-        |> List.filter (fun s -> s.values.Length > 0)
+            | false -> getStates s target)
 
 let getSolutions values target =
     match List.contains target values with
     | true -> [ [] ]
     | false ->
-        getRows { values = values; rows = [] } target
+        getStates (initialState values) target
         |> List.filter (fun state ->
-            match (List.tryLast state.rows) with
-            | Some row ->
-                match row.result with
-                | Some result -> result = target
-                | _ -> false
+            match List.tryLast state.rows with
+            | Some row -> row.result = target
             | _ -> false)
         |> List.sortBy (fun state -> state.rows.Length)
         |> List.map (fun state -> state.rows)

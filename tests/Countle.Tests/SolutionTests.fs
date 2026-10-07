@@ -25,28 +25,27 @@ let ``every reported solution ends in the target and each step is valid arithmet
         let solutions = getSolutions values target
 
         solutions
-        |> List.forall (fun rows ->
-            let stepsValid =
-                rows
-                |> List.forall (fun row -> row.result = apply row.operation row.left row.right)
+        |> List.forall (fun states ->
+            let allStatesValid =
+                states
+                |> List.forall (fun state ->
+                    match apply state.operation state.left state.right with
+                    | Some rowResult -> rowResult = state.result
+                    | _ -> false)
 
             let endsInTarget =
-                match List.tryLast rows with
-                | Some row -> row.result = Some target
+                match List.tryLast states with
+                | Some row -> row.result = target
                 | None -> List.contains target values
 
-            stepsValid && endsInTarget)
-        |> Prop.trivial (List.isEmpty solutions)) //  |> Prop.collect $"{values.Length} numbers")
-
-// [<Property>]
-// let ``every puzzle has a solution`` () =
-//     Prop.forAll smallPuzzle (fun (values, target) -> getSolutions values target |> List.isEmpty |> not)
+            allStatesValid && endsInTarget)
+        |> Prop.trivial (List.isEmpty solutions)
+        |> Prop.collect $"{values.Length} numbers")
 
 // --- Solvable puzzles ----------------------------------------------------------
 
 // A puzzle that is solvable by construction: repeatedly combine two of the numbers with a
 // randomly chosen valid operation until a single number is left, and use that as the target.
-// The steps are kept so that a failing case shows how its target was built.
 type SolvablePuzzle =
     {
         numbers: int list
@@ -54,29 +53,34 @@ type SolvablePuzzle =
         steps: string list
     }
 
+let twoDistinctRandomIndices length =
+    gen {
+        let! i = Gen.choose (0, length - 1)
+        let! j = Gen.choose (0, length - 2)
+        return i, (if j >= i then j + 1 else j)
+    }
+
+let getValuesDescending i j (values: int list) =
+    max values[i] values[j], min values[i] values[j]
+
 let solvablePuzzle count =
-    let rec combine pool steps =
+    let rec combine availableNumbers steps =
         gen {
-            match pool with
-            | [ result ] -> return result, List.rev steps
+            match availableNumbers with
+            | [ value ] -> return value, List.rev steps
             | _ ->
-                let! i = Gen.choose (0, pool.Length - 1)
+                let! i, j = twoDistinctRandomIndices availableNumbers.Length
+                let larger, smaller = getValuesDescending i j availableNumbers
 
-                let! j =
-                    Gen.choose (0, pool.Length - 2)
-                    |> Gen.map (fun j -> if j >= i then j + 1 else j)
-
-                let larger, smaller = max pool[i] pool[j], min pool[i] pool[j]
-
-                let! f, symbol =
+                let! operation, symbol =
                     operations
-                    |> List.filter (fun (f, _) -> (f larger smaller).IsSome)
+                    |> List.filter (fun (op, _) -> (op larger smaller).IsSome)
                     |> Gen.elements
 
-                let result = (f larger smaller).Value
+                let result = (operation larger smaller).Value
 
                 let rest =
-                    pool
+                    availableNumbers
                     |> List.indexed
                     |> List.filter (fun (k, _) -> k <> i && k <> j)
                     |> List.map snd
@@ -85,7 +89,7 @@ let solvablePuzzle count =
         }
 
     gen {
-        let! numbers = Gen.listOfLength count (Gen.choose (1, 25))
+        let! numbers = Gen.listOfLength count (Gen.choose (1, 100))
         let! target, steps = combine numbers []
 
         return
@@ -110,3 +114,7 @@ let ``any operation on three numbers is always found`` () =
 [<Property>]
 let ``any operation on four numbers is always found`` () =
     Prop.forAll (solvablePuzzle 4 |> Arb.fromGen) hasSolution
+
+[<Property>]
+let ``any operation on five numbers is always found`` () =
+    Prop.forAll (solvablePuzzle 5 |> Arb.fromGen) hasSolution
